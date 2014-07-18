@@ -1,0 +1,204 @@
+\documentclass{report}
+%\usepackage[english]{babel}
+%\selectlanguage{english}
+% \usepackage[utf8]{inputenc}
+%\usepackage{float}
+% \usepackage{graphicx}
+% \usepackage{textcomp}
+% \usepackage{a4wide}
+% \usepackage{hyperref}
+% \usepackage{float}
+% \usepackage{color}
+% \usepackage{amssymb,amsmath}
+% \sloppy
+
+
+% Title Page
+\title{Setup AngularJS as standalone}
+
+
+\author{Nicolas Florentin}
+
+
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This short tutorial explains how to setup your environement with:
+  \begin{itemize}
+   \item \textbf{bower}: a package manager
+   \item \textbf{yeoman}: a generator tool to scaffold your app
+   \item \textbf{karma}: for unit testing
+   \item \textbf{protractor} and \textbf{jasmine}: for e2e testing
+  \end{itemize} 
+
+It assumes that you have already setup \textbf{git}, \textbf{npm} and \textbf{node}.
+\end{abstract}
+
+\section*{Installation \& project generation}
+
+\subsection*{Install yeoman}
+
+\begin{verbatim}
+ npm install -global yo
+\end{verbatim}
+
+\subsection*{Install angular's generator}
+
+\begin{verbatim}
+ npm install --global generator-angular
+\end{verbatim}
+
+\subsection*{Generate your app}
+
+Create directory and go into it.
+
+\begin{verbatim}
+ yo angular
+\end{verbatim}
+
+\section*{Installation \& configuration of test tools}
+
+\subsection*{Installation protractor \& protractor runner}
+
+\begin{verbatim}
+ npm install protractor grunt-protractor-runner --save-dev
+\end{verbatim}
+
+\subsection*{configuration}
+
+Create \verb+protractor.conf.js+ into root directory and copy this configuration:
+
+\begin{verbatim}
+ exports.config = {
+  
+  allScriptsTimeout: 99999,
+ 
+  // The address of a running selenium server.
+ 
+
+  // Capabilities to be passed to the webdriver instance.
+  capabilities: {
+    'browserName': 'chrome'
+  },
+ 
+  baseUrl: 'http://localhost:9001/',
+ 
+  framework: 'jasmine',
+ 
+  // Spec patterns are relative to the current working directly when
+  // protractor is called.
+  specs: ['test/e2e/*.js'],
+ 
+  // Options to be passed to Jasmine-node.
+  jasmineNodeOpts: {
+    showColors: true,
+    defaultTimeoutInterval: 30000,
+    isVerbose : true,
+    includeStackTrace : true
+  }
+};
+\end{verbatim}
+
+\section*{Configuration of grunt task for e2e testing}
+
+Add this task:
+\begin{verbatim}
+ protractor: {
+  options: {
+    keepAlive: true,
+    configFile: "protractor.conf.js"
+  },
+  run: {}
+ }
+\end{verbatim}
+
+Registrer the task:
+\begin{verbatim}
+ grunt.registerTask('teste2e', [
+  'clean:server',
+  'concurrent:test',
+  'autoprefixer',
+  'connect:test',
+  'karma',
+  'protractor:run'
+  ]);
+\end{verbatim}
+
+\section*{Configuration of npm task to update webdriver}
+
+Add the line \verb+install" [...] webdriver-manager update+ into \verb+package.json+ (root directory):
+
+{\scriptsize
+\begin{verbatim}
+"scripts": {
+"test": "grunt test",
+"install": "node node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manager update"
+}
+\end{verbatim}}
+
+Run \verb+npm install+ to update the drivers.
+
+\section*{Test's files setup}
+
+In \verb+test+ directory:
+\begin{itemize}
+ \item create directory \verb+e2e+ and go into it
+ \item create a file \verb+*.js+
+\end{itemize}
+
+Copy the \textit{fake} tests into the file:
+
+\begin{verbatim}
+ 'use strict';
+ /* https://github.com/angular/protractor/blob/master/docs/getting-started.md */
+ 
+ describe('my app', function() {
+ 
+  beforeEach(function () {
+    browser.get('index.html');
+  });
+ 
+  it('should be true', function() {
+    expect(true).toBe(true);
+  }); 
+ });
+\end{verbatim}
+
+\section*{Run tests}
+
+\subsection*{Unit tests}
+
+\begin{verbatim}
+ grunt test
+\end{verbatim}
+
+\subsection*{E2e tests}
+
+\begin{verbatim}
+ grunt teste2e
+\end{verbatim}
+
+
+\section*{}
+{\Huge\begin{center}
+ Enjoy
+\end{center}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
